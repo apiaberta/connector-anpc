@@ -1,24 +1,33 @@
-# connector-anpc
+# API Aberta — Civil Protection Connector (ANPC)
 
-Civil protection incidents connector for API Aberta.
+Microservice for civil protection alerts and emergency information.
 
-Data source: [fogos.pt](https://api.fogos.pt) (aggregates ANEPC/ICNF official data)
+## Features
 
-Updated every **5 minutes**.
+- Active warnings and alerts
+- Fire risk index
+- Emergency bulletins
+- Historical data
 
 ## Endpoints
 
-- `GET /v1/anpc/incidents/active` — all currently active incidents
-- `GET /v1/anpc/incidents?district=Lisboa&active=true&page=1` — paginated list with filters
-- `GET /v1/anpc/summary` — counts by district and incident type
+- `GET /health` — Service health check
+- `GET /meta` — Service metadata
+- `GET /warnings` — Active warnings
+- `GET /risk` — Fire risk by district
 
-## Filters (incidents endpoint)
+## Setup
 
-| Parameter | Description |
-|-----------|-------------|
-| `active` | `true`/`false` (default: `true`) |
-| `district` | District name (case-insensitive) |
-| `natureza` | Incident type (e.g. `Mato`, `Florestal`) |
-| `from` | ISO datetime filter |
-| `to` | ISO datetime filter |
-| `page`, `limit` | Pagination |
+```bash
+npm install
+cp .env.example .env
+npm start
+```
+
+## Data Source
+
+ANPC (Autoridade Nacional de Emergência e Proteção Civil)
+
+## License
+
+MIT
