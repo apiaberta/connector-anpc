@@ -49,6 +49,27 @@ app.get('/meta', async () => {
   }
 })
 
+app.get('/anpc/meta', async () => {
+  const latest  = await Incident.findOne({ active: true }).sort({ datetime: -1 }).lean()
+  const active  = await Incident.countDocuments({ active: true })
+  const total   = await Incident.countDocuments()
+
+  return {
+    service:          SERVICE_NAME,
+    version:          '1.1.0',
+    source:           'https://api.fogos.pt (ANEPC / ICNF)',
+    description:      'Civil protection incidents in Portugal (fires, floods, rescue operations)',
+    active_incidents: active,
+    total_incidents:  total,
+    last_incident:    latest?.datetime || null,
+    update_frequency: {
+      incidents: 'every 5 minutes',
+      risk:      'every 6 hours',
+      warnings:  'every 5 minutes'
+    }
+  }
+})
+
 // ─── Data routes ─────────────────────────────────────────────────────────────
 
 await app.register(dataRoutes)
