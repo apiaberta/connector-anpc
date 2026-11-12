@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  lint:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,4 +16,4 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: node --check src/index.js src/connector.js src/routes/data.js src/db/models.js
+      - run: npm test

@@ -1,0 +1,50 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": 101,
+      "date": "2026-11-12",
+      "dateTime": { "sec": 1794520800 },
+      "natureza": "Mato",
+      "naturezaCode": "3101",
+      "status": "Em Curso",
+      "statusCode": 5,
+      "active": true,
+      "district": "Porto",
+      "concelho": "Gondomar",
+      "freguesia": "Rio Tinto",
+      "location": "Rio Tinto",
+      "lat": 41.18,
+      "lng": -8.56,
+      "regiao": "Norte",
+      "sub_regiao": "AMP",
+      "terrain": 12,
+      "aerial": 1,
+      "heliFight": 0,
+      "planeFight": 0,
+      "meios_aquaticos": 0
+    },
+    {
+      "id": "202",
+      "date": "2026-11-12",
+      "dateTime": { "sec": 1794521800 },
+      "natureza": "Florestal",
+      "naturezaCode": "3103",
+      "status": "Em Resolução",
+      "statusCode": 6,
+      "district": "Aveiro",
+      "concelho": "Águeda",
+      "freguesia": "Aguada de Cima",
+      "localidade": "Aguada de Cima",
+      "lat": 40.52,
+      "lng": -8.39,
+      "regiao": "Centro",
+      "sub_regiao": "Aveiro",
+      "terrain": 4,
+      "aerial": 0,
+      "heliFight": 1,
+      "planeFight": 1,
+      "meios_aquaticos": 2
+    }
+  ]
+}
