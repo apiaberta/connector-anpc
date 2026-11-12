@@ -1,0 +1,19 @@
+{
+  "success": true,
+  "data": [
+    {
+      "_id": { "$id": "warn-1" },
+      "text": "Corte na EN109",
+      "label": "via-cortada"
+    },
+    {
+      "_id": "warn-2",
+      "text": "Condicionamento A1",
+      "label": "transito"
+    },
+    {
+      "_id": null,
+      "text": "should be skipped"
+    }
+  ]
+}

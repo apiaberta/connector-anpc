@@ -4,42 +4,47 @@
  * Returns road-cut and emergency notices from ANEPC/VOST
  */
 
-import { Warning } from '../db/models.js'
+import { Warning as WarningModel } from '../db/models.js'
+import { bulkWriteInBatches } from '../db/bulk.js'
+import { FOGOS_V1, fetchFogosJSON } from '../fogos.js'
 
-const FOGOS_API = 'https://api.fogos.pt/v1'
-
-async function fetchJSON (path) {
-  const res = await fetch(`${FOGOS_API}${path}`, {
-    signal: AbortSignal.timeout(15000),
-    headers: { 'User-Agent': 'apiaberta-connector/1.0 (https://apiaberta.pt)' }
-  })
-  if (!res.ok) throw new Error(`fogos.pt ${path}: HTTP ${res.status}`)
-  return res.json()
-}
-
-export async function syncWarnings () {
-  const json = await fetchJSON('/warnings')
-  if (!json.success) throw new Error('fogos.pt /warnings returned success=false')
-
-  const items = json.data || []
-  let upserted = 0
-
-  for (const item of items) {
+export function mapFogosWarning (item, now = new Date()) {
     const sourceId = item._id?.$id ?? item._id ?? null
-
-    await Warning.findOneAndUpdate(
-      { sourceId },
-      {
-        sourceId,
+    if (sourceId == null || sourceId === '') return null
+    return {
+        sourceId: String(sourceId),
         text:     item.text ?? '',
         label:    item.label ?? '',
         source:   'fogos.pt',
-        syncedAt: new Date()
-      },
-      { upsert: true }
-    )
-    upserted++
-  }
+        syncedAt: now
+    }
+}
 
-  return { upserted }
+export function buildWarningBulkOps (items, now = new Date()) {
+    const ops = []
+    for (const item of items) {
+        const doc = mapFogosWarning(item, now)
+        if (!doc) continue
+        ops.push({
+            updateOne: {
+                filter: { sourceId: doc.sourceId },
+                update: { $set: doc },
+                upsert: true
+            }
+        })
+    }
+    return ops
+}
+
+export async function syncWarnings ({
+    fetchJSON = (path) => fetchFogosJSON(FOGOS_V1, path),
+    Warning = WarningModel,
+    now = new Date()
+} = {}) {
+    const json = await fetchJSON('/warnings')
+    if (!json.success) throw new Error('fogos.pt /warnings returned success=false')
+
+    const ops = buildWarningBulkOps(json.data || [], now)
+    await bulkWriteInBatches(Warning, ops)
+    return { upserted: ops.length }
 }

@@ -1,11 +1,12 @@
 {
   "name": "@apiaberta/connector-anpc",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Civil protection incidents connector for API Aberta (via fogos.pt/ANEPC)",
   "type": "module",
   "scripts": {
     "dev": "node --watch src/index.js",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "test": "find src test -name '*.js' | xargs node --check && node --test --test-concurrency=1 test/*.test.js"
   },
   "dependencies": {
     "fastify": "^5.0.0",
