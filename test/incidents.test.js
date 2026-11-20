@@ -8,6 +8,7 @@ import {
     INCIDENT_PUBLIC_PROJECTION,
     LATEST_ACTIVE_HINT,
     WARNING_PUBLIC_PROJECTION,
+    accentInsensitiveRegex,
     buildIncidentBulkOps,
     buildIncidentQuery,
     findLatestActiveIncident,
@@ -90,6 +91,7 @@ describe('formatIncident', () => {
             status: 'Em Curso',
             active: true,
             district: 'Porto',
+            concelho: 'Paredes',
             concerto: undefined,
             freguesia: 'Rio Tinto',
             location: 'Rio Tinto',
@@ -111,6 +113,7 @@ describe('formatIncident', () => {
             active: true,
             location: {
                 district: 'Porto',
+                concelho: 'Paredes',
                 concerto: undefined,
                 freguesia: 'Rio Tinto',
                 address: 'Rio Tinto',
@@ -156,5 +159,33 @@ describe('projections', () => {
         assert.equal(WARNING_PUBLIC_PROJECTION.sourceId, 1)
         assert.equal(WARNING_PUBLIC_PROJECTION._id, 0)
         assert.equal(WARNING_PUBLIC_PROJECTION.syncedAt, undefined)
+    })
+})
+
+describe('concelho filter', () => {
+    it('matches the municipality regardless of case and accents', () => {
+        const re = accentInsensitiveRegex('Covilha')
+        assert.equal(re.test('Covilhã'), true)
+        assert.equal(re.test('COVILHÃ'), true)
+        assert.equal(re.test('Fundão'), false)
+    })
+
+    it('escapes regex metacharacters in the municipality name', () => {
+        const re = accentInsensitiveRegex('S. João (x)')
+        assert.equal(re.test('S. João (x)'), true)
+        assert.equal(re.test('Sxjoao'), false)
+    })
+
+    it('is added to the incident query and does not replace district', () => {
+        const query = buildIncidentQuery({ district: 'Castelo Branco', concelho: 'Covilha' })
+        assert.equal(query.district.test('Castelo Branco'), true)
+        assert.equal(query.concelho.test('Covilhã'), true)
+        assert.equal(query.active, true)
+    })
+
+    it('is returned in formatIncident location', () => {
+        const out = formatIncident({ incident_id: '1', district: 'Castelo Branco', concelho: 'Covilhã', location: 'Covilhã, Boidobra' })
+        assert.equal(out.location.concelho, 'Covilhã')
+        assert.equal(out.location.district, 'Castelo Branco')
     })
 })
