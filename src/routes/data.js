@@ -36,6 +36,7 @@ export async function dataRoutes (app) {
                 properties: {
                     active:   { type: 'boolean', description: 'Filter by active status (default: true)' },
                     district: { type: 'string',  description: 'Filter by district name (case-insensitive)' },
+                    concelho: { type: 'string',  description: 'Filter by municipality name (case- and accent-insensitive, e.g. Covilha)' },
                     natureza: { type: 'string',  description: 'Filter by incident type (e.g. Mato, Florestal)' },
                     from:     { type: 'string',  description: 'ISO date filter (from)' },
                     to:       { type: 'string',  description: 'ISO date filter (to)' },
@@ -45,8 +46,8 @@ export async function dataRoutes (app) {
             }
         }
     }, async (req) => {
-        const { active = true, district, natureza, from, to, page = 1, limit = 20 } = req.query
-        const query = buildIncidentQuery({ active, district, natureza, from, to })
+        const { active = true, district, concelho, natureza, from, to, page = 1, limit = 20 } = req.query
+        const query = buildIncidentQuery({ active, district, concelho, natureza, from, to })
         const skip = (page - 1) * limit
 
         const [incidents, total] = await Promise.all([

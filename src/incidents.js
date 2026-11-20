@@ -36,9 +36,24 @@ export const WARNING_PUBLIC_PROJECTION = {
     source: 1
 }
 
+const VOWEL_CLASS = {
+    a: '[aáàâãä]', e: '[eéèêë]', i: '[iíìîï]', o: '[oóòôõö]', u: '[uúùûü]', c: '[cç]'
+}
+
+// Case- and accent-insensitive match: "Covilha" finds "Covilhã".
+export function accentInsensitiveRegex (text) {
+    const plain = String(text).normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
+    const pattern = [...plain].map(ch => {
+        const cls = VOWEL_CLASS[ch.toLowerCase()]
+        return cls ?? ch.replace(/[.*+?^${}()|[\]\\/-]/g, '\\$&')
+    }).join('')
+    return new RegExp(pattern, 'i')
+}
+
 export function buildIncidentQuery ({
     active = true,
     district,
+    concelho,
     natureza,
     from,
     to
@@ -46,6 +61,7 @@ export function buildIncidentQuery ({
     const query = {}
     if (active !== undefined) query.active = active
     if (district) query.district = new RegExp(district, 'i')
+    if (concelho) query.concelho = accentInsensitiveRegex(concelho)
     if (natureza) query.natureza = new RegExp(natureza, 'i')
     if (from || to) {
         query.datetime = {}
@@ -108,6 +124,7 @@ export function formatIncident (inc) {
         active:    inc.active,
         location: {
             district:  inc.district,
+            concelho:  inc.concelho,
             concerto:  inc.concerto,
             freguesia: inc.freguesia,
             address:   inc.location,
